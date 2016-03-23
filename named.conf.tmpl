@@ -1,0 +1,32 @@
+server 0.0.0.0/0 {
+  edns {{ default .Env.EDNS "yes" }};
+};
+
+options {
+  directory "/var/cache/bind";
+  {{if .Env.FORWARD }}
+  forward {{ .Env.FORWARD }};
+  {{end}}
+  allow-query { {{ default .Env.ALLOW_QUERY "any" }};};
+
+  forwarders { {{ default .Env.FORWARDERS "8.8.8.8; 8.8.8.4;" }} };
+  max-cache-size {{ default .Env.MAX_CACHE_SIZE "100M" }};
+
+  max-cache-ttl {{ default .Env.MAX_CACHE_TTL "60" }};
+  max-ncache-ttl {{ default .Env.MAX_NCACHE_TTL "60" }};
+
+  clients-per-query {{ default .Env.CLIENTS_PER_QUERY "0" }};
+  max-clients-per-query {{ default .Env.MAX_CLIENTS_PER_QUERY "0" }};
+
+  dnssec-enable {{ default .Env.DNSSEC_ENABLE "yes" }};
+  dnssec-validation {{ default .Env.DNSSEC_VALIDATION "yes" }};
+};
+
+
+{{if .Env.CONSUL }}
+zone "consul" IN {
+  type forward;
+  forward only;
+  forwarders { {{ default .Env.CONSUL_HOST "127.0.0.1" }} port {{ default .Env.CONSUL_PORT "8600" }}; };
+};
+{{end}}

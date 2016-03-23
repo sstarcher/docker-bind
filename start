@@ -1,0 +1,11 @@
+#!/bin/sh
+set -ae
+if [[ -n "$CONSUL" ]]; then
+    DNSSEC_ENABLE="no"
+    DNSSEC_VALIDATION="no"
+    EDNS="no"
+fi
+
+dockerize \
+    -template /etc/bind/named.conf.tmpl:/etc/bind/named.conf \
+    named -c /etc/bind/named.conf -g -u named
